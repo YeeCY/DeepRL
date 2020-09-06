@@ -320,19 +320,19 @@ class OptionGaussianActorCriticNet(nn.Module, BaseNet):
         beta = []
         for option in self.options:
             prediction = option(phi)
-            mean.append(prediction['mean'].unsqueeze(1))
+            mean.append(prediction['mean'].unsqueeze(1))  # TODO (chongyi zheng): unsqueeze for options
             std.append(prediction['std'].unsqueeze(1))
             beta.append(prediction['beta'])
         mean = torch.cat(mean, dim=1)
         std = torch.cat(std, dim=1)
         beta = torch.cat(beta, dim=1)
 
-        phi_a = self.actor_body(phi)
+        phi_a = self.actor_body(phi)  # TODO (chongyi zheng): phi actor
         phi_a = self.fc_pi_o(phi_a)
         pi_o = F.softmax(phi_a, dim=-1)
         log_pi_o = F.log_softmax(phi_a, dim=-1)
 
-        phi_c = self.critic_body(phi)
+        phi_c = self.critic_body(phi)  # TODO (chongyi zheng): phi critic
         q_o = self.fc_q_o(phi_c)
         u_o = self.fc_u_o(phi_c)
 

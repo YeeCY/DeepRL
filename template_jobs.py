@@ -57,11 +57,11 @@ def batch_mujoco():
 
     for game in games:
         for r in range(10):
-            # params.append([a_squared_c_ppo_continuous, dict(game=game, run=r, tasks=False, remark='ASC-PPO', gate=nn.Tanh())])
+            params.append([a_squared_c_ppo_continuous, dict(game=game, run=r, tasks=False, remark='ASC-PPO', gate=nn.Tanh())])
             # params.append([a_squared_c_a2c_continuous, dict(game=game, run=r, tasks=False, remark='ASC-A2C', gate=nn.Tanh())])
             # params.append([ppo_continuous, dict(game=game, run=r, tasks=False, remark='PPO', gate=nn.Tanh())])
             # params.append([oc_continuous, dict(game=game, run=r, tasks=False, remark='OC', gate=nn.Tanh())])
-            params.append([ppoc_continuous, dict(game=game, run=r, tasks=False, remark='PPOC', gate=nn.Tanh())])
+            # params.append([ppoc_continuous, dict(game=game, run=r, tasks=False, remark='PPOC', gate=nn.Tanh())])
 
             # params.append([a_squared_c_a2c_continuous,
             #                dict(game=game, run=r, tasks=False, remark='ASC-A2C', gate=nn.Tanh(), num_workers=4)])
@@ -575,10 +575,10 @@ if __name__ == '__main__':
     set_one_thread()
     select_device(-1)
 
-    # batch_mujoco()
-    batch_dm()
+    batch_mujoco()
+    # batch_dm()
 
-    game = 'HalfCheetah-v2'
+    # game = 'HalfCheetah-v2'  # TODO (chongyi zheng): comment out
     # game = 'Walker2d-v2'
     # game = 'Swimmer-v2'
     # game = 'dm-walker-walk'
@@ -655,15 +655,16 @@ if __name__ == '__main__':
     #     # gate=nn.Tanh(),
     # )
 
-    ppoc_continuous(
-        game=game,
-        log_level=1,
-        num_o=4,
-        tasks=False,
-        # tasks=True,
-        # max_steps=int(4e3),
-        gate=nn.Tanh(),
-    )
+    # TODO (chongyi zheng): comment out
+    # ppoc_continuous(
+    #     game=game,
+    #     log_level=1,
+    #     num_o=4,
+    #     tasks=False,
+    #     # tasks=True,
+    #     # max_steps=int(4e3),
+    #     gate=nn.Tanh(),
+    # )
 
     # visualize_a_squared_c(
     #     game=game,
