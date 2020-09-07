@@ -171,6 +171,50 @@ def batch_dm():
     exit()
 
 
+def batch_robosuite():
+    cf = Config()
+    cf.add_argument('--i', type=int, default=0)
+    cf.add_argument('--j', type=int, default=0)
+    cf.merge()
+
+    # TODO (chongyi zheng): single environment
+    games = ['SawyerLift']
+
+    params = []
+
+    # TODO (chongyi zheng): add num_run
+    num_run = 1
+    for game in games:
+        for r in range(num_run):
+            params.append(
+                [a_squared_c_ppo_continuous, dict(game=game, run=r, tasks=False, remark='ASC-PPO', gate=nn.Tanh())])
+            # params.append([a_squared_c_a2c_continuous, dict(game=game, run=r, tasks=False, remark='ASC-A2C', gate=nn.Tanh())])
+            # params.append([ppo_continuous, dict(game=game, run=r, tasks=False, remark='PPO', gate=nn.Tanh())])
+            # params.append([oc_continuous, dict(game=game, run=r, tasks=False, remark='OC', gate=nn.Tanh())])
+            # params.append([ppoc_continuous, dict(game=game, run=r, tasks=False, remark='PPOC', gate=nn.Tanh())])
+
+            # params.append([a_squared_c_a2c_continuous,
+            #                dict(game=game, run=r, tasks=False, remark='ASC-A2C', gate=nn.Tanh(), num_workers=4)])
+            # params.append(
+            #     [oc_continuous, dict(game=game, run=r, tasks=False, remark='OC', gate=nn.Tanh(), num_workers=4)])
+            # params.append(
+            #     [iopg_continuous, dict(game=game, run=r, tasks=False, remark='IOPG', gate=nn.Tanh(), num_workers=4)])
+
+            # params.append([ahp_ppo_continuous, dict(game=game, run=r, tasks=False, remark='AHP', gate=nn.Tanh())])
+            # params.append([iopg_continuous, dict(game=game, run=r, tasks=False, remark='IOPG', gate=nn.Tanh())])
+
+    # params = []
+    # for r in range(2):
+    #     for num_o in [2, 4, 8]:
+    #         for beta_w in [0, 0.01, 0.1]:
+    #             params.append([a_squared_c_ppo_continuous, dict(game='dm-cheetah', run=r, tasks=True, remark='vis',
+    #                                                             num_o=num_o, beta_weight=beta_w)])
+
+    algo, param = params[cf.i]
+    algo(**param)
+    exit()
+
+
 def set_tasks(config):
     if config.game == 'dm-walker':
         tasks = ['walk', 'run']
@@ -579,8 +623,9 @@ if __name__ == '__main__':
     set_one_thread()
     select_device(-1)
 
-    batch_mujoco()
+    # batch_mujoco()
     # batch_dm()
+    batch_robosuite()
 
     # game = 'HalfCheetah-v2'  # TODO (chongyi zheng): comment out
     # game = 'Walker2d-v2'

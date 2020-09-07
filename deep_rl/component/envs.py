@@ -27,16 +27,23 @@ except ImportError:
 def make_env(env_id, seed, rank, episode_life=True):
     def _thunk():
         random_seed(seed)
+        # TODO (chongyi zheng): add robosuite tasks
         if env_id.startswith("dm"):
             import dm_control2gym
             _, domain, task = env_id.split('-')
             env = dm_control2gym.make(domain_name=domain, task_name=task)
+        elif env_id.startswith('Sawyer'):
+            import robosuite
+            from utils.robosuite_wrapper import GymWrapper
+            env = GymWrapper(robosuite.make(env_id, has_renderer=True, use_object_obs=True, use_camera_obs=False,
+                                            gripper_visualization=True))
         else:
             env = gym.make(env_id)
         is_atari = hasattr(gym.envs, 'atari') and isinstance(
             env.unwrapped, gym.envs.atari.atari_env.AtariEnv)
         if is_atari:
             env = make_atari(env_id)
+        # TODO (chongyi zheng): no seed method in robosuite tasks
         env.seed(seed + rank)
         env = OriginalReturnWrapper(env)
         if is_atari:

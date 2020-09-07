@@ -172,6 +172,7 @@ class ASquaredCPPOAgent(BaseAgent):
         return to_np(actions)
 
     def record_obs(self, env, dir, steps):
+        # TODO (chongyi zheng): record robosuite observations
         env = env.env.envs[0]
         env.env.render_mode_list['rgb_array']['render_kwargs']['camera_id'] = 'side'
         obs = env.render(mode='rgb_array')
