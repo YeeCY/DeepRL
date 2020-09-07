@@ -178,7 +178,7 @@ def batch_robosuite():
     cf.merge()
 
     # TODO (chongyi zheng): single environment
-    games = ['SawyerLift']
+    games = ['SawyerLift', 'SawyerPickPlaceMilk']
 
     params = []
 
@@ -625,7 +625,7 @@ if __name__ == '__main__':
 
     # batch_mujoco()
     # batch_dm()
-    batch_robosuite()
+    # batch_robosuite()
 
     # game = 'HalfCheetah-v2'  # TODO (chongyi zheng): comment out
     # game = 'Walker2d-v2'
@@ -642,6 +642,8 @@ if __name__ == '__main__':
     # game = 'dm-fish-downleft'
     # game = 'dm-walker-squat'
     # game = 'dm-walker-backward'
+    game = 'SawyerLift'
+    # game = 'SawyerPickPlaceMilk'
 
     # ppo_continuous(
     #     game=game,
@@ -673,6 +675,18 @@ if __name__ == '__main__':
     #     # gate=nn.Tanh(),
     #     save_interval=int(1e6 / 2048) * 2048,
     # )
+
+    # TODO (chongyi zheng): run DAC + PPO with robosuite tasks
+    a_squared_c_ppo_continuous(
+        game=game,
+        max_steps=2e6,
+        learning='all',
+        log_level=1,
+        num_o=4,
+        opt_ep=5,
+        freeze_v=False,
+        save_interval=int(1e6 / 2048) * 2048,
+    )
 
     # ahp_ppo_continuous(
     #     game=game,
