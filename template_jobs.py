@@ -40,7 +40,9 @@ def batch_mujoco():
     ]
 
     # games = ['HalfCheetah-v2', 'Walker2d-v2', 'Swimmer-v2', 'Hopper-v2', 'Reacher-v2']
-    games = ['HalfCheetah-v2', 'Walker2d-v2', 'Swimmer-v2', 'Hopper-v2']
+    # TODO (chongyi zheng): single environment
+    # games = ['HalfCheetah-v2', 'Walker2d-v2', 'Swimmer-v2', 'Hopper-v2']
+    games = ['HalfCheetah-v2']
 
     params = []
 
@@ -55,8 +57,10 @@ def batch_mujoco():
     #                                             entropy_weight=entropy_weight, tasks=False)])
     #         params.append([ppo_continuous, dict(game=game, run=r, tasks=False)])
 
+    # TODO (chongyi zheng): add num_run
+    num_run = 1
     for game in games:
-        for r in range(10):
+        for r in range(num_run):
             params.append([a_squared_c_ppo_continuous, dict(game=game, run=r, tasks=False, remark='ASC-PPO', gate=nn.Tanh())])
             # params.append([a_squared_c_a2c_continuous, dict(game=game, run=r, tasks=False, remark='ASC-A2C', gate=nn.Tanh())])
             # params.append([ppo_continuous, dict(game=game, run=r, tasks=False, remark='PPO', gate=nn.Tanh())])

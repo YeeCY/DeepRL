@@ -215,7 +215,8 @@ class ASquaredCPPOAgent(BaseAgent):
                                          prediction['mean'], prediction['std'])
 
             v_bar = prediction['q_o'].gather(1, options.unsqueeze(-1))
-            v_hat = (prediction['q_o'] * pi_hat).sum(-1).unsqueeze(-1)  # TODO (chongyi zheng): high level value can be expressed by low level value
+            # TODO (chongyi zheng): high level value can be expressed by low level value
+            v_hat = (prediction['q_o'] * pi_hat).sum(-1).unsqueeze(-1)
 
             next_states, rewards, terminals, info = self.task.step(to_np(actions))
             self.record_online_return(info)
