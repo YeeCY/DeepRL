@@ -616,6 +616,64 @@ def visualize_a_squared_c(**kwargs):
             pickle.dump(agent.all_options, f)
 
 
+def record_a_squared_c(**kwargs):
+    # generate_tag(kwargs)
+    kwargs.setdefault('log_level', 0)
+    kwargs.setdefault('num_o', 4)
+    kwargs.setdefault('learning', 'all')
+    kwargs.setdefault('gate', nn.ReLU())
+    kwargs.setdefault('freeze_v', False)
+    kwargs.setdefault('opt_ep', 5)
+    kwargs.setdefault('entropy_weight', 0.01)
+    kwargs.setdefault('tasks', False)
+    kwargs.setdefault('max_steps', 2e6)
+    kwargs.setdefault('beta_weight', 0)
+    config = Config()
+    config.merge(kwargs)
+
+    if config.tasks:
+        set_tasks(config)
+
+    if 'dm-humanoid' in config.game:
+        hidden_units = (128, 128)
+    else:
+        hidden_units = (64, 64)
+
+    config.task_fn = lambda: Task(config.game)
+    config.eval_env = config.task_fn()
+
+    config.network_fn = lambda: OptionGaussianActorCriticNet(
+        config.state_dim, config.action_dim,
+        num_options=config.num_o,
+        actor_body=FCBody(config.state_dim, hidden_units=hidden_units, gate=config.gate),
+        critic_body=FCBody(config.state_dim, hidden_units=hidden_units, gate=config.gate),
+        option_body_fn=lambda: FCBody(config.state_dim, hidden_units=hidden_units, gate=config.gate),
+    )
+    config.optimizer_fn = lambda params: torch.optim.Adam(params, 3e-4, eps=1e-5)
+    config.discount = 0.99
+    config.use_gae = True
+    config.gae_tau = 0.95
+    config.gradient_clip = 0.5
+    config.rollout_length = 2048
+    config.optimization_epochs = config.opt_ep
+    config.mini_batch_size = 64
+    config.ppo_ratio_clip = 0.2
+    config.log_interval = 2048
+    config.state_normalizer = MeanStdNormalizer()
+    agent = ASquaredCPPOAgent(config)
+
+    filepath = kwargs['filepath']
+    file_dir = os.path.dirname(filepath)
+    filename = os.path.basename(filepath)
+    agent.all_options = []
+    agent.load(filepath)
+    sub_dir = '%s/record_episode_%s' % (file_dir, filename)
+    agent.record_episode(sub_dir, config.eval_env)
+    subprocess.run(['ffmpeg', '-i', '%s/%%04d.png' % sub_dir, '%s.gif' % sub_dir])
+    with open('%s_options.bin' % sub_dir, 'wb') as f:
+        pickle.dump(agent.all_options, f)
+
+
 if __name__ == '__main__':
     mkdir('log')
     mkdir('data')
@@ -677,16 +735,16 @@ if __name__ == '__main__':
     # )
 
     # TODO (chongyi zheng): run DAC + PPO with robosuite tasks
-    a_squared_c_ppo_continuous(
-        game=game,
-        max_steps=2e6,
-        learning='all',
-        log_level=1,
-        num_o=4,
-        opt_ep=5,
-        freeze_v=False,
-        save_interval=int(1e6 / 2048) * 2048,
-    )
+    # a_squared_c_ppo_continuous(
+    #     game=game,
+    #     max_steps=2e6,
+    #     learning='all',
+    #     log_level=1,
+    #     num_o=4,
+    #     opt_ep=5,
+    #     freeze_v=False,
+    #     save_interval=int(1e6 / 2048) * 2048,
+    # )
 
     # ahp_ppo_continuous(
     #     game=game,
@@ -738,3 +796,13 @@ if __name__ == '__main__':
     #     freeze_v=False,
     #     tasks=True,
     # )
+
+    # TODO (chongyi zheng): visualize DAC + PPO with robosuite tasks
+    record_a_squared_c(
+        game=game,
+        log_level=1,
+        tag=None,
+        num_o=4,
+        freeze_v=False,
+        filepath='data/ASquaredCPPOAgent-SawyerLift-freeze_v_False-learning_all-log_level_1-max_steps_2000000.0-num_o_4-opt_ep_5-save_interval_999424-run-0-1998848',
+    )

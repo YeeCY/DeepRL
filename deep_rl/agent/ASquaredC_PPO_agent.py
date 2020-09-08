@@ -7,7 +7,7 @@
 from ..network import *
 from ..component import *
 from .BaseAgent import *
-from skimage import color
+from skimage import img_as_ubyte
 
 
 # 'hat' is the high-MDP
@@ -173,11 +173,17 @@ class ASquaredCPPOAgent(BaseAgent):
 
     def record_obs(self, env, dir, steps):
         # TODO (chongyi zheng): record robosuite observations
+        config = self.config
+
         env = env.env.envs[0]
-        env.env.render_mode_list['rgb_array']['render_kwargs']['camera_id'] = 'side'
-        obs = env.render(mode='rgb_array')
-        obs = color.rgb2gray(obs)
-        obs = color.gray2rgb(obs)
+        if 'Sawyer' in config.game:
+            env.env.viewer.set_camera(0)
+            obs = env.env._get_observation()['image'][::-1]  # manually flip the image
+        else:
+            env.env.render_mode_list['rgb_array']['render_kwargs']['camera_id'] = 'side'
+            obs = env.render(mode='rgb_array')
+        if obs.dtype == np.uint8:
+            obs = obs / 255.0
 
         mask = [
             [1, 0, 0],  # red
@@ -188,9 +194,25 @@ class ASquaredCPPOAgent(BaseAgent):
 
         o = np.asscalar(to_np(self.prev_options))
         self.all_options.append(o)
-        obs = obs * mask[o]
 
-        imsave('%s/%04d.png' % (dir, steps), obs)
+        def crop_center(img, crop_x, crop_y):
+            y, x = img.shape[0], img.shape[1]
+            start_x = x // 2 - (crop_x // 2)
+            start_y = y // 2 - (crop_y // 2)
+            return img[start_y:start_y + crop_y, start_x:start_x + crop_x]
+
+        def paste_center(img, patch, paste_x, paste_y):
+            y, x = img.shape[0], img.shape[1]
+            start_x = x // 2 - (paste_x // 2)
+            start_y = y // 2 - (paste_y // 2)
+            img[start_y:start_y + paste_y, start_x:start_x + paste_x] = patch
+            return img
+
+        patch = crop_center(obs, obs.shape[0] - 32, obs.shape[1] - 32)
+        obs = np.ones_like(obs) * mask[o]
+        obs = paste_center(obs, patch, obs.shape[0] - 32, obs.shape[1] - 32)
+
+        imsave('%s/%04d.png' % (dir, steps), img_as_ubyte(obs))
 
     def step(self):
         config = self.config

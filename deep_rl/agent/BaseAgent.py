@@ -29,7 +29,7 @@ class BaseAgent:
     def load(self, filename):
         state_dict = torch.load('%s.model' % filename, map_location=lambda storage, loc: storage)
         self.network.load_state_dict(state_dict)
-        with open('%s.stats' % (filename), 'rb') as f:
+        with open('%s.stats' % filename, 'rb') as f:
             self.config.state_normalizer.load_state_dict(pickle.load(f))
 
     def eval_step(self, state):

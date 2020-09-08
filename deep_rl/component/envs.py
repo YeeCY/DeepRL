@@ -35,9 +35,8 @@ def make_env(env_id, seed, rank, episode_life=True):
         elif env_id.startswith('Sawyer'):
             import robosuite
             from utils.robosuite_wrapper import GymWrapper
-            env = GymWrapper(robosuite.make(env_id, has_renderer=False, has_offscreen_renderer=False,
-                                            use_object_obs=True, use_camera_obs=False, gripper_visualization=True,
-                                            reward_shaping=True))
+            env = GymWrapper(robosuite.make(env_id, has_renderer=True, use_object_obs=True, use_camera_obs=True,
+                                            gripper_visualization=True, reward_shaping=True))
         else:
             env = gym.make(env_id)
         is_atari = hasattr(gym.envs, 'atari') and isinstance(

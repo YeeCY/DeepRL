@@ -24,7 +24,7 @@ class GymWrapper(Wrapper):
                 consist of concatenated keys from the wrapped environment's
                 observation dictionary. Defaults to robot-state and object-state.
         """
-        super(GymWrapper, self).__init__(env)
+        Wrapper.__init__(self, env)
         self.np_random = None
 
         if keys is None:
